@@ -1,146 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Gif App</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="GifApp.css">
+  <title>Gif App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="GifApp.css">
 </head>
+
 <body>
-<h1> <i>Welcome To My Fantastic Gif Maker!</i> </h1>
+  <h1> <i>Welcome To My Fantastic Gif Maker!</i> </h1>
 
-<input id="srchbar" type="text"> <a href="#">Create Gif</a>
+  <input id="srchbar" type="text"> <a href="#">Create Gif</a>
+
+  <div id="GifBoundaries">
+
+  </div>
+  <div id="GifArea">
+
+  </div>
+
+  <script>
+
+    var giph
+
+    $("a").on("click", function (event) {
+      let myButton = $("<button>")
+
+      $("#GifBoundaries").append(myButton)
+
+      myButton.text($("#srchbar").val());
+      // for creating the button
+      myButton.addClass("GifButton")
+
+    })
 
 
+    $(document).on("click", ".GifButton", function (event) {
 
-<div id="GifBoundaries">
+      $('#GifArea').empty()
 
+      giph = $(this).text()
+      console.log($(this).text());
+
+      let API = "https://api.giphy.com/v1/gifs/search?q="
+        + giph + "&api_key=0Qf6BgSbh5i77eHrNvGpxe2TFMzBS1zD&limit=10";
+
+      $.ajax({
+        url: API,
+        method: "GET"
+      })
+        .then(function (response) {
+     
+          for (var i = 0; i < response.data.length; i++) {
+           
+            var paused = response.data[i].images.fixed_height_still.url;
+            var animated = response.data[i].images.fixed_height.url;
+            var image = $("<img>");
+            image.attr("src", animated);
+            image.attr('data-state', paused)
+            image.attr('data-still', paused)
+            image.attr('data-animate', animated)
+
+            
+            $("#GifArea").append(image)
+          }
+          $("img").on("click", function () {
+              var state = $(this).attr("data-state");
+
+              if (state === "paused") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animated");
+              }
+              else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "paused");
+              }
+            });
+          console.log(response);
+        })
+        .catch(function (response) {
+          console.log('request failed ' + response)
+        })
+    })
+
+    /* First, we have 2 different values from the response data,one value is the paused gifs and the other is the animated gifs
+       second, the image tag that holds either the paused or animated gifs need a corresponding attribute to hold either one
     
+      */
 
-</div>
-
-
-<div id="GifArea">
-
-    
-
-    </div>
-
-
-<script>
-
-    //First, lets attach an on click function to our button.
-   //next,lets make the function create our new buttons.
-// each new button needs to be unique
-// we need to create the buttons to have a class
-// now lets figure out how to use the giphy API
-
-
-// $("a").on("click", function(){
-// var person = $(this).attr("data-person");
-// var API = "https://api.giphy.com/v1/gifs/search?q=" 
-//  + person + "0Qf6BgSbh5i77eHrNvGpxe2TFMzBS1zD";
-
-var giph ;
-      
- 
-
-//  $.ajax({
-//      APIurl: API,     
-//      method: "GET"
-
-//  })
-
-//  .then(function(response){
-
-//  var results = response.data;
-
-//  for (var i = 0; i < results.length; i++) {
-//     var gifDiv = $("<div>");
-
-
-//        var rating = results[i].rating;
-
-//          var p = $("<p>").text("Rating: " + rating); 
-
-//          var personImage = $("<img>");
-
-//         personImage.attr("src" , results[i].images.fixed_height.url);
-
-//        gifDiv.prepend(p);
-//         gifDiv.prepend(presonImage);
-
-//         $("#GifBoundaries").prepend(gifDiv);    
-// }
-// })
-
-$("a").on("click", function(event){
-
-let myButton = $("<button>") 
-
-
-$("#GifBoundaries").append(myButton)
-
-myButton.text($("#srchbar").val());
-
-
-
-
-myButton.addClass("GifButton")
-
-})
-
-
-$(document).on("click",".GifButton", function(event){
-
- giph = $(this).text()
-console.log($(this).text());
-
-var API = "https://api.giphy.com/v1/gifs/search?q="
-+ giph + "&api_key=0Qf6BgSbh5i77eHrNvGpxe2TFMzBS1zD&limit=10";
-
- $.ajax({
-     url: API,     
-     method: "GET"
- })
-.then(function(response){
-console.log(response.data[0].images.downsized_still);
-for (var i = 0; i< response.data.length; i++){
-//    console.log(response.data[i].images.fixed_height_still.url);
-
-var GIFimage = response.data[i].images.fixed_height_still.url;
-
- var image = $(`<button class="Playable"> <img src="${GIFimage}"></button>`);
-
-  
-
-   $("#GifArea").append(image);
-}
-
-
-
-
-console.log(response);
-})
-.catch(function(response){
-console.log('request failed ' + response)
-})
-
-$("button").on("click", function(){
-
-
-
-})
-
-
-
-
-})
-
-
-
-
-</script>
+  </script>
 
 </body>
 </html>
